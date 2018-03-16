@@ -1,7 +1,13 @@
-document.getElementById('loadButton').onclick = testMyCallBack;
+document.getElementById('loadButton').onclick = loadCallback;
+document.getElementById('deleteButton').onclick = deleteCallback;
 
-function testMyCallBack() {
+var recordSet;
+var dataHeader;
+
+function loadCallback() 
+{
     var csvFile = document.getElementById('csvFile').files[0]; 
+    var headerList = document.getElementById('listBox');
     
     if( !csvFile )
     {
@@ -9,12 +15,33 @@ function testMyCallBack() {
         return false;
     }
     
-    var reader = new FileReader();
-    
-    reader.onload = function(file)
+    Papa.parse(csvFile, {
+        /* Config for parsing */
+        complete: function(results)
+        {
+            recordSet = results.data;
+            dataHeader = recordSet[0];
+            recordSet.shift();
+            
+            for( var i = 0; i < dataHeader.length; i++ )
+            {
+                var opt = document.createElement('option');
+                opt.value = dataHeader[i];
+                opt.innerHTML = dataHeader[i];
+                headerList.appendChild(opt);
+            }
+        }
+    })
+}
+
+function deleteCallback(col)
+{
+    col = 0;
+    for( var i = 0; i < recordSet.length; i++ )
     {
-        console.log(reader.result)
-    };
+        recordSet[i].splice(col, 1);
+    }
     
-    reader.readAsText(csvFile);
+    console.log(dataHeader);
+    console.log(recordSet);
 }
